@@ -12,3 +12,5 @@
 2025-02-27 13:18:46,243 - ERROR - Failed to post to Facebook for me: 403 Client Error: Forbidden for url: https://graph.facebook.com/540357995832682/photos - Response: {"error":{"message":"(#200) The permission(s) publish_actions are not available. It has been deprecated. If you want to provide a way for your app users to share content to Facebook, we encourage you to use our Sharing products instead.","type":"OAuthException","code":200,"fbtrace_id":"Ab5sxpmCyeUumQ3UL0AEhht"}}
 2025-02-27 13:20:55,321 - INFO - Uploading image from: images\me\cmdtech.png for client: me
 2025-02-27 13:20:59,928 - INFO - Successfully posted to Facebook for me: Did you know? AI can predict the best times to explore York!
+2025-02-27 13:31:58,371 - INFO - Uploading image from: images\me\cmdtech.png for client: me
+2025-02-27 13:32:01,803 - INFO - Successfully posted to Facebook for me: Quick AI trick: Ask an AI to suggest picnic spots in York.
