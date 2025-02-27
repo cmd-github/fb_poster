@@ -18,4 +18,4 @@ jobs:
       - name: Install dependencies
         run: pip install requests
       - name: Run script
-        run: python fb_poster.py --client me --msg-file ai_tips.txt --msg-mode sequential --photo-mode random --photo-dir images
+        run: python fb_poster.py --client me --msg-file ai_tips.txt --msg-mode random --photo-mode random --photo-dir images
