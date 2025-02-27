@@ -1,7 +1,7 @@
 name: Post for Me
 on:
   schedule:
-    - cron: '0 10 * 16 *'  # Runs twice daily at 10:00 and 16:00 UTC
+    - cron: '0 10,16 * * *'  # Runs twice daily at 10:00 and 16:00 UTC
   workflow_dispatch:  # Allows manual trigger
 
 jobs:
