@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: pip install requests
       - name: Run script
-        run: python facebook_poster.py --client me --msg-file ai_tips.txt --msg-mode sequential --photo-mode random --photo-dir images
+        run: python fb_poster.py --client me --msg-file ai_tips.txt --msg-mode sequential --photo-mode random --photo-dir images
       - name: Commit progress file
         run: |
           git config --global user.name "GitHub Action"
