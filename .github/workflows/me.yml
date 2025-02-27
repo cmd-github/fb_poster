@@ -1,0 +1,28 @@
+name: Post for Me
+on:
+  schedule:
+    - cron: '0 10 * 16 *'  # Runs twice daily at 10:00 and 16:00 UTC
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    env:
+      TOKENS: ${{ secrets.TOKENS }}  # Injects secrets as environment variable
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install dependencies
+        run: pip install requests
+      - name: Run script
+        run: python facebook_poster.py --client me --msg-file ai_tips.txt --msg-mode sequential --photo-mode random --photo-dir images
+      - name: Commit progress file
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add progress_me.json
+          git commit -m "Update progress for me" || echo "No changes"
+          git push
