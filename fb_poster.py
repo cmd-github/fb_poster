@@ -4,12 +4,13 @@ import os
 import json
 import argparse
 import logging
+from datetime import datetime
 
-# Set up logging to track success or errors
+# Set up logging
 logging.basicConfig(filename='facebook_poster.log', level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Argument parser for client-specific configurations
+# Argument parser
 parser = argparse.ArgumentParser(description="Post to Facebook for clients")
 parser.add_argument('--client', required=True, help="Client name (e.g., 'me', 'ryan', 'paul')")
 parser.add_argument('--msg-file', required=True, help="Message file (e.g., 'ai_tips.txt')")
@@ -20,7 +21,7 @@ parser.add_argument('--photo-mode', choices=['random', 'sequential'], default='r
 parser.add_argument('--photo-dir', default='images', help="Base directory for photos")
 args = parser.parse_args()
 
-# Load tokens: Try environment variable first (GitHub Actions), then fallback to local tokens.json
+# Load tokens from environment variable (GitHub Actions) or local tokens.json
 tokens_json = os.getenv("TOKENS")
 if tokens_json:
     TOKENS = json.loads(tokens_json)
@@ -40,44 +41,30 @@ if client not in TOKENS:
 fb_page_access_token = TOKENS[client]["FB_PAGE_TOKEN"]
 fb_page_id = TOKENS[client]["FB_PAGE_ID"]
 
-# Check if tokens are valid
 if not fb_page_access_token or not fb_page_id:
     logging.error(f"Missing FB_PAGE_TOKEN or FB_PAGE_ID for client: {client}")
     raise ValueError(f"FB_PAGE_TOKEN or FB_PAGE_ID missing for client: {client}")
-
-# Progress tracking for sequential mode
-PROGRESS_FILE = f"progress_{client}.json"
-def load_progress():
-    """Load the current index for sequential posting."""
-    if os.path.exists(PROGRESS_FILE):
-        with open(PROGRESS_FILE, 'r') as f:
-            return json.load(f)
-    return {"msg_index": 0, "photo_index": 0}
-
-def save_progress(msg_index, photo_index):
-    """Save the updated index for sequential posting."""
-    with open(PROGRESS_FILE, 'w') as f:
-        json.dump({"msg_index": msg_index, "photo_index": photo_index}, f)
 
 # Function to get a message
 def get_message(filename, mode):
     """Get a message from the file based on mode (random or sequential)."""
     try:
         with open(filename, 'r') as file:
-            messages = [line.strip() for line in file if line.strip()]  # Remove empty lines
+            messages = [line.strip() for line in file if line.strip()]
         if not messages:
             logging.warning(f"{filename} is empty; using default message")
             return "Default message"
-        
+
         if mode == 'random':
             return random.choice(messages)
-        else:  # sequential
-            progress = load_progress()
-            index = progress["msg_index"]
-            msg = messages[index % len(messages)]  # Loop if end reached
-            progress["msg_index"] = index + 1
-            save_progress(progress["msg_index"], progress["photo_index"])
-            return msg
+        else:  # Sequential - Use today's date
+            today_str = datetime.today().strftime('%Y-%m-%d')
+            for line in messages:
+                if line.startswith(today_str):
+                    return line.split(": ", 1)[1]  # Extract message after date
+            logging.error(f"No message found for today's date: {today_str}")
+            raise ValueError(f"No message found for today's date: {today_str}")
+
     except FileNotFoundError:
         logging.error(f"Message file not found: {filename}")
         raise FileNotFoundError(f"Please create {filename} with some messages")
@@ -93,14 +80,11 @@ def get_image(base_dir, mode):
         
         if mode == 'random':
             return os.path.join(image_dir, random.choice(images))
-        else:  # sequential
-            progress = load_progress()
+        else:  # sequential - pick image by today's date index
+            today_index = datetime.today().day % len(images)  # Loop through images based on day of the month
             sorted_images = sorted(images)  # Alphabetical order
-            index = progress["photo_index"]
-            image = sorted_images[index % len(sorted_images)]  # Loop if end reached
-            progress["photo_index"] = index + 1
-            save_progress(progress["msg_index"], progress["photo_index"])
-            return os.path.join(image_dir, image)
+            return os.path.join(image_dir, sorted_images[today_index])
+
     except FileNotFoundError:
         logging.error(f"Image folder not found: {image_dir}")
         raise FileNotFoundError(f"Please create {image_dir} with some images")

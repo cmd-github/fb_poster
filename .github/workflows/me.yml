@@ -19,16 +19,3 @@ jobs:
         run: pip install requests
       - name: Run script
         run: python fb_poster.py --client me --msg-file ai_tips.txt --msg-mode sequential --photo-mode random --photo-dir images
-      - name: Commit progress file
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}
-        run: |
-          git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
-          git remote set-url origin https://x-access-token:${GH_PAT}@github.com/cmd-github/fb_poster.git
-          git add progress_me.json
-          git commit -m "Update progress for me" || echo "No changes"
-          git push origin main
-
-
-
