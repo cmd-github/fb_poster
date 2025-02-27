@@ -1,0 +1,85 @@
+# 📢 Facebook Auto-Poster Bot
+
+This script automates **scheduled posts to Facebook Pages** using the **Meta Graph API**.  
+It allows different **clients (users)** to post **daily AI tips, messages, or images** from a structured file, based on a predefined schedule.
+
+---
+
+## 🚀 **How It Works**
+1. The script reads **a text file (`ai_tips.txt`)** containing messages with **date-based selection**.
+2. It selects the message for **today's date** (if available).
+3. It picks a **random or sequential image** from the client’s folder.
+4. It **posts the selected message and image** to the specified **Facebook Page**.
+
+---
+
+## ⚙️ **How to Modify Variables**
+### **1️⃣ Configuring Clients & Facebook Tokens**
+Each **client (user)** has a unique **Facebook Page Token & Page ID**.  
+These are stored in a **GitHub Secret** (`TOKENS`) in **JSON format**.
+
+#### **Modify in GitHub Secrets (`Settings > Secrets > Actions`):**
+```json
+{
+  "me": {
+    "FB_PAGE_TOKEN": "EAA...me_token...",
+    "FB_PAGE_ID": "540357995832682"
+  },
+  "client1": {
+    "FB_PAGE_TOKEN": "EAA...ryan_token...",
+    "FB_PAGE_ID": "61572882148229"
+  },
+  "client2": {
+    "FB_PAGE_TOKEN": "EAA...paul_token...",
+    "FB_PAGE_ID": "123456789"
+  }
+}
+
+Setting Up Message Files
+Each client has a separate text file with their daily messages.
+
+The script finds today’s date in the file and posts that message.
+If today’s date is missing, no post is made.
+
+Example: ai_tips.txt Format
+2025-02-27: AI tip: Chatbots can help brainstorm your next adventure.
+2025-02-28: AI tip: Automate repetitive tasks using AI-powered workflows.
+2025-02-29: AI tip: AI can summarize long articles in seconds.
+2025-03-01: AI tip: Use AI for sentiment analysis to understand customer feedback.
+
+
+Setting Up Image Selection
+    Images must be stored inside the images/ folder.
+    Each client has a subfolder (images/me, images/client1, images/client2).
+    Modes:
+    random → Selects a random image each time.
+    sequential → Picks images in order based on today’s date.
+
+🕒 Automating with GitHub Actions
+    The script runs automatically using GitHub Actions, according to a schedule defined in .github/workflows/me.yml.
+    Changing the Schedule
+        Edit .github/workflows/me.yml:
+        on:
+        schedule:
+            - cron: '0 10,16 * * *'  # Runs at 10 AM and 4 PM UTC daily
+    Use crontab.guru to customize the schedule.
+
+🚀 Manually Running the Script
+    If you want to run the script manually:
+        Go to GitHub → Actions.
+        Select the "Post for Me" workflow.
+        Click "Run Workflow".
+
+❓ Troubleshooting
+    No post today?
+    → Check if today’s date is in ai_tips.txt.
+    Image not found?
+    → Ensure images exist in images/<client>/ folder.
+    GitHub Actions failed?
+    → View logs under GitHub → Actions → Workflow Run.
+
+🔒 Security & Best Practices
+    Never commit sensitive API tokens.
+    Use GitHub Secrets for storing tokens.
+    Limit API permissions (only pages_manage_posts required).
+    **Review GitHub Actions logs for any errors
